@@ -29,6 +29,15 @@ EM Algorithm for two-component Gaussian Mixture
 }
 \examples{
 \dontrun{
+rv_mix<-function(N,p){
+u1<-rnorm(N,0,1)
+u2<-rnorm(N,2,1)
+j<-runif(N)
+k<-as.integer(j>p)
+u<-k*u1+(1-k)u2
+return (u)
+}
+
 p<-0.6
 N<-1000
 set.seed(2335)
@@ -37,6 +46,6 @@ p_0<-0.5
 mu1<-0.5
 mu2<-1.5
 sigma1<-sigma2<-sd(rv)
-EM_mix(mu1,sigma1,mu2,sigma2,p,rv)
+EM_mix(mu1,sigma1,mu2,sigma2,p_0,N,rv)
 }
 }

@@ -4,3 +4,5 @@ src/*.dll
 src/*.o
 .Rproj.user
 src/*.so
+/doc/
+/Meta/

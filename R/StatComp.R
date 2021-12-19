@@ -18,6 +18,15 @@
 #' @return the maximum likelihood estimation of the mean, variance and the mixed probablity
 #' @examples
 #' \dontrun{
+#' rv_mix<-function(N,p){
+#' u1<-rnorm(N,0,1)
+#' u2<-rnorm(N,2,1)
+#' j<-runif(N)
+#' k<-as.integer(j>p)
+#' u<-k*u1+(1-k)u2
+#' return (u)
+#' }
+#' 
 #' p<-0.6
 #' N<-1000
 #' set.seed(2335)
@@ -26,7 +35,7 @@
 #' mu1<-0.5
 #' mu2<-1.5
 #' sigma1<-sigma2<-sd(rv)
-#' EM_mix(mu1,sigma1,mu2,sigma2,p,rv)
+#' EM_mix(mu1,sigma1,mu2,sigma2,p_0,N,rv)
 #' }
 #' @export
 EM_mix<-function(mu1,sigma1,mu2,sigma2,p,N,rv){
@@ -40,7 +49,7 @@ EM_mix<-function(mu1,sigma1,mu2,sigma2,p,N,rv){
     }
     #M-step
     mu1<-sum((1-phi)*rv)/sum(1-phi)
-    s1<-sum((1-phi)*(rv-mu1)^2)
+    s1<-sum((1-phi)*(rv-mu1)^2)/sum(1-phi)
     mu2<-sum(phi*rv)/sum(phi)
     s2<-sum(phi*(rv-mu2)^2)/sum(phi)
     sigma1<-sqrt(s1)
@@ -70,18 +79,28 @@ rv_mix<-function(N,p){
 #' @return the maximum likelihood estimation of the mean, variance and the mixed probablity
 #' @examples
 #' \dontrun{
+#' rv_mix<-function(N,p){
+#' u1<-rnorm(N,0,1)
+#' u2<-rnorm(N,2,1)
+#' j<-runif(N)
+#' k<-as.integer(j>p)
+#' u<-k*u1+(1-k)u2
+#' return (u)
+#' }
+#' 
 #' p<-0.6
 #' N<-1000
 #' set.seed(2335)
 #' rv<-rv_mix(N,p)
+#' p_0<-0.5
 #' mu1<-0.5
 #' mu2<-1.5
 #' sigma1<-sigma2<-sd(rv)
-#' EM<-EM_mix(mu1,sigma1,mu2,sigma2,p)
+#' EM<-EM_mix(mu1,sigma1,mu2,sigma2,p_0,N,rv)
 #' sigma1<-EM[2]
 #' sigma2<-EM[4]
-#' p<-EM[5]
-#' Gibbs_mix(mu1,mu2,sigma1,sigma2,p,N,rv)
+#' p_hat<-EM[5]
+#' Gibbs_mix(mu1,mu2,sigma1,sigma2,p_hat,N,rv)
 #' }
 #' @export
 Gibbs_mix<-function(mu1,mu2,sigma1,sigma2,p,N,rv){
