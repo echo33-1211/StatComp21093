@@ -1,0 +1,87 @@
+---
+title: "Introduction to StatComp21093"
+author: 'Zhang Shan'
+date: "2021/12/18"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to StatComp21093}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Overview
+
+__StatComp21093__ is a simple R package developed to estimate the parameter of the two-component Gaussian mixture distribution with EM algorithm and the Gibbs sampling for the mixed distribution. Two functions are considered, namely, _EM_mix_ (EM Algorithm for two-component Gaussian mixture) and _Gibbs_mix_ (Gibbs sampling for two-component Gaussian mixture).
+
+In the EM_mix, we estimate the $\mu_1,\mu_2,\sigma_1^2,\sigma_2^2,p$ with the EM algorithm;
+
+The source R code for _EM_mix_ is as follows:
+```{r}
+EM_mix<-function(mu1,sigma1,mu2,sigma2,p,N,rv){
+  phi<-rep(0,N)
+  for (i in 1:1000) {
+    #E-step
+    for (j in 1:N) {
+      f1<-dnorm(rv[j],mu1,sigma1)
+      f2<-dnorm(rv[j],mu2,sigma2)
+      phi[j]<-p*f2/((1-p)*f1+p*f2)
+    }
+    #M-step
+    mu1<-sum((1-phi)*rv)/sum(1-phi)
+    s1<-sum((1-phi)*(rv-mu1)^2)
+    mu2<-sum(phi*rv)/sum(phi)
+    s2<-sum(phi*(rv-mu2)^2)/sum(phi)
+    sigma1<-sqrt(s1)
+    sigma2<-sqrt(s2)
+    p<-sum(phi)/N
+  }
+  return(c(mu1,sigma1,mu2,sigma2,p))
+}
+rv_mix<-function(N,p){
+  u1<-rnorm(N,0,1)
+  u2<-rnorm(N,2,1)
+  j<-runif(N)
+  k<-as.integer(j>p)
+  u<-k*u1+(1-k)*u2
+  return (u)
+}
+```
+
+In the Gibbs_mix, for simplicity we fix the $\sigma_1^2,\sigma_2^2$ and mixing proportion $p$ at their maximum likelihood values (with the above EM algorithm) so that the only unknown parameters are the mwans $\mu_1$ and $\mu_2$.
+
+The source R code for _Gibbs_mix_ is as follows:
+```{r}
+Gibbs_mix<-function(mu1,mu2,sigma1,sigma2,p,N,rv){
+  X<-matrix(0,1000,2)
+  z<-rep(0,N)
+  for (i in 1:1000) {
+    for (j in 1:N){
+      f1<-dnorm(rv[j],mu1,sigma1)
+      f2<-dnorm(rv[j],mu2,sigma2)
+      phi<-p*f2/((1-p)*f1+p*f2)
+      
+      u<-runif(1)
+      if(u<phi){
+        z[j]<-1
+      }else{
+        z[j]<-0
+      }
+    }
+    mu1<-sum((1-z)*rv)/sum(1-z)
+    mu2<-sum(z*rv)/sum(z)
+    X[i,1]<-rnorm(1,mu1,sigma1)
+    X[i,2]<-rnorm(1,mu2,sigma2)
+  }
+  return(X)
+}
+rv_mix<-function(N,p){
+  u1<-rnorm(N,0,1)
+  u2<-rnorm(N,2,1)
+  j<-runif(N)
+  k<-as.integer(j>p)
+  u<-k*u1+(1-k)*u2
+  return (u)
+}
+```
+
+

@@ -1,0 +1,6 @@
+doc
+Meta
+src/*.dll
+src/*.o
+.Rproj.user
+src/*.so
